@@ -1,0 +1,10 @@
+LCD Pin         Rpi Pin
+      1         GPIO2
+      2         GND
+      3         GPIO3
+      4         GPIO4
+      5         GPIO17
+      6         MOSI (SPI)
+      7         CLK (SPI)
+      8         3.3V
+

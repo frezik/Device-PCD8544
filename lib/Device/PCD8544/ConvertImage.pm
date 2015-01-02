@@ -25,6 +25,61 @@ package Device::PCD8544::ConvertImage;
 
 use v5.14;
 use warnings;
+use Device::PCD8544::Exceptions;
+
+use constant WIDTH  => 84;
+use constant HEIGHT => 48;
+
+
+sub convert
+{
+    my ($img) = @_;
+    my $width = $img->getwidth;
+    my $height = $img->getheight;
+    if( ($width != WIDTH) || ($height != HEIGHT) ) {
+        Device::PCD8544::ImageSizeException->throw( 'Width/height is'
+            . " $width/$height"
+            . ', expected is ' . WIDTH . '/' . HEIGHT
+            . '.  Please rescale image.' );
+    }
+
+    my @lcd_bitmap = ();
+    
+    my $total_pixels = $width * $height;
+    for( my $i = 0; $i < $total_pixels; $i += 8 ) {
+        my $max_i = $i + 7;
+        $max_i    = $total_pixels - 1 if $max_i >= $total_pixels;
+        my @pixels = _get_pixels( $img, $width, $height, $i, $max_i );
+
+        my $val = $pixels[0];
+        foreach my $j (1 .. 7) {
+            $val <<= 1;
+            $val |= $pixels[$j];
+        }
+
+        push @lcd_bitmap, $val;
+    }
+
+    return \@lcd_bitmap;
+}
+
+
+sub _get_pixels
+{
+    my ($img, $width, $height, $i_min, $i_max) = @_;
+
+    my @pixels;
+    foreach my $i ($i_min .. $i_max) {
+        my $x = $i % $width;
+        my $y = int( $i / $width );
+        my $pixel = $img->getpixel( x => $x, y => $y );
+        my ($r, $g, $b, $a) = $pixel->rgba;
+        my $val = ($r || $g || $b) ? 0 : 1;
+        push @pixels, $val;
+    }
+
+    return @pixels;
+}
 
 
 1;

@@ -21,9 +21,23 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 3;
-use v5.14;
+package Device::PCD8544::Exceptions;
 
-use_ok( 'Device::PCD8544' );
-use_ok( 'Device::PCD8544::Exceptions' );
-use_ok( 'Device::PCD8544::ConvertImage' );
+use v5.14;
+use warnings;
+use base 'Exception::Tiny';
+
+
+package Device::PCD8544::ImageSizeException;
+
+use base 'Device::PCD8544::Exceptions';
+
+
+1;
+__END__
+
+=head1 NAME
+
+  Device::PCD8544::Exceptions - All the exceptions we could throw
+
+=cut
