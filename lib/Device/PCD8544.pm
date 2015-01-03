@@ -361,7 +361,8 @@ else.
   set_image( \@IMG );
 
 Sets an arrayref image.  Each entry is an 8-bit word, with each bit representing 
-a pixel.  See 
+a pixel.  See C<Device::PCD8544::ConvertImage> for converting Imager objects 
+into this format.
 
 Be sure to call C<update()> to actually send the image to the display.
 
