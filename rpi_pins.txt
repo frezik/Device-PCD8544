@@ -1,7 +1,9 @@
+Using the Sparkfun breakout board
+
 LCD Pin         Rpi Pin
       1         GPIO2
       2         GND
-      3         GPIO3
+      3         CE0 (GPIO8)
       4         GPIO4
       5         GPIO17
       6         MOSI (SPI)
