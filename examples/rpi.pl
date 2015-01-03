@@ -91,8 +91,8 @@ my $lcd = Device::PCD8544->new({
     power    => 2,
     rst      => 24,
     dc       => 23,
-    contrast => 0x60,
-    bias     => Device::PCD8544->BIAS_1_48,
+    contrast => 0x3C,
+    bias     => Device::PCD8544->BIAS_1_40,
 });
 
 $lcd->init;

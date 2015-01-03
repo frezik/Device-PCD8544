@@ -59,6 +59,8 @@ use Device::WebIO::Device::DigitalOutput;
 use Device::WebIO::Device::SPI;
 use Time::HiRes ();
 
+use constant DEBUG => 0;
+
 use constant {
     BIAS_1_100 => 0b000,
     BIAS_1_80  => 0b001,
@@ -126,7 +128,7 @@ has 'dc' => (
 );
 has 'contrast' => (
     is      => 'rw',
-    default => sub { 0x60 },
+    default => sub { 0x3C },
     trigger => sub {
         my ($self, $val) = @_;
         return 1 unless $self->_was_init_called;
@@ -136,7 +138,7 @@ has 'contrast' => (
 );
 has 'bias' => (
     is      => 'rw',
-    default => sub { BIAS_1_48 },
+    default => sub { BIAS_1_40 },
     trigger => sub {
         my ($self, $val) = @_;
         return 1 unless $self->_was_init_called;
@@ -192,9 +194,13 @@ sub reset
     $webio->output_pin( $rst, 1 );
     Time::HiRes::usleep( 5_000 );
 
+    say "Setting bias (" . SETBIAS . " | " . $self->bias . ")" if DEBUG;
     $self->_send_extended_command( SETBIAS | $self->bias );
+    say "Setting contrast (" . SETVOP . " | " . $self->contrast . ")" if DEBUG;
     $self->_send_extended_command( SETVOP  | $self->contrast );
+    say "Setting Y Addr (" . SETYADDR . ")" if DEBUG;
     $self->_send_command( SETYADDR | 0x00 );
+    say "Setting X Addr (" . SETXADDR . ")" if DEBUG;
     $self->_send_command( SETXADDR | 0x00 );
 
     return 1;
@@ -245,6 +251,7 @@ sub display_inverse
 sub _send_command
 {
     my ($self, $cmd) = @_;
+    say "Sending command $cmd" if DEBUG;
 
     my $webio = $self->webio;
     $webio->output_pin( $self->dc, 0 );
@@ -258,10 +265,12 @@ sub _send_command
 sub _send_extended_command
 {
     my ($self, $cmd) = @_;
+    say "Sending extended command $cmd {" if DEBUG;
     $self->_send_command( FUNCTIONSET | EXTENDED_INSTRUCTION );
     $self->_send_command( $cmd );
     $self->_send_command( FUNCTIONSET );
     $self->_send_command( DISPLAY_CONTROL | DISPLAY_NORMAL );
+    say "}" if DEBUG;
     return 1;
 }
 
@@ -300,8 +309,8 @@ __END__
         power    => 2,
         rst      => 24,
         dc       => 23,
-        contrast => 0x60,
-        bias     => Device::PCD8544->BIAS_1_48,
+        contrast => 0x3C,
+        bias     => Device::PCD8544->BIAS_1_40,
     });
     
     $lcd->init;
@@ -345,7 +354,7 @@ Constructor.  Params:
 
 =item * dc: GPIO pin for the Data/Control wire.
 
-=item * contrast: Contrast level for the display.  This should be between 0x00 and 0x7F.  0x60 is usually a nice default.
+=item * contrast: Contrast level for the display.  This should be between 0x00 and 0x7F.  0x3C is usually a nice default.
 
 =item * bias: Set bias level of the device.  Default is BIAS_1_48.  See the device datasheet for details.
 
