@@ -46,39 +46,27 @@ sub convert
     my @lcd_bitmap = ();
     
     my $total_pixels = $width * $height;
-    for( my $i = 0; $i < $total_pixels; $i += 8 ) {
-        my $max_i = $i + 7;
-        $max_i    = $total_pixels - 1 if $max_i >= $total_pixels;
-        my @pixels = _get_pixels( $img, $width, $height, $i, $max_i );
+    my $word = 0x00;
+    my $pixels_counted = 0;
+    foreach my $x (0 .. ($width-1)) {
+        foreach my $y (0 .. ($height-1)) {
+            my $pixel = $img->getpixel( x => $x, y => $y )
+                or die "Could not get pixel ($x, $y)\n";
 
-        my $val = $pixels[0];
-        foreach my $j (1 .. 7) {
-            $val <<= 1;
-            $val |= $pixels[$j];
+            my @channels = $pixel->rgba;
+            my $val = $channels[0] ? 0 : 1;
+
+            $word = ($word << 1) | $val;
+            $pixels_counted++;
+
+            if( $pixels_counted >= 8 ) {
+                push @lcd_bitmap, $word;
+                $word           = 0x00;
+                $pixels_counted = 0;
+            }
         }
-
-        push @lcd_bitmap, $val;
     }
-
     return \@lcd_bitmap;
-}
-
-
-sub _get_pixels
-{
-    my ($img, $width, $height, $i_min, $i_max) = @_;
-
-    my @pixels;
-    foreach my $i ($i_min .. $i_max) {
-        my $x = $i % $width;
-        my $y = int( $i / $width );
-        my $pixel = $img->getpixel( x => $x, y => $y );
-        my ($r, $g, $b, $a) = $pixel->rgba;
-        my $val = ($r || $g || $b) ? 0 : 1;
-        push @pixels, $val;
-    }
-
-    return @pixels;
 }
 
 

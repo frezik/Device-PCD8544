@@ -1,0 +1,9 @@
+Revision history for perl module Device::PCD8544
+
+0.481538334543082 2015-01-??
+
+- Image conversion implemented
+
+0.0268329147520525 2015-01-03
+
+- Initial release

@@ -74,8 +74,7 @@ if( $@ ) {
     plan skip_all => 'Imager not installed';
 }
 else {
-    plan skip_all => 'Conversion not yet implemented';
-    #plan tests => 2;
+    plan tests => 2;
     eval "use Device::PCD8544::ConvertImage";
 }
 
@@ -91,4 +90,4 @@ ok( ($@ && Device::PCD8544::ImageSizeException->caught( $@ )),
 my $test_bmp = Imager->new( file => TEST_IMG )
     or die Imager->errstr;
 my $test_output = Device::PCD8544::ConvertImage::convert( $test_bmp );
-is_deeply( $test_output => EXPECT_CONVERT_OUTPUT, "Image converted" );
+is_deeply( EXPECT_CONVERT_OUTPUT, $test_output, "Image converted" );
