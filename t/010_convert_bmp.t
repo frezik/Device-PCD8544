@@ -74,20 +74,27 @@ if( $@ ) {
     plan skip_all => 'Imager not installed';
 }
 else {
-    plan tests => 2;
+    plan skip_all => 'Converter not yet implemented';
+    #plan tests => 2;
     eval "use Device::PCD8544::ConvertImage";
 }
 
 
-my $oversized = Imager->new( file => OVERSIZED_TEST_IMG )
-    or die Imager->errstr;
+my $oversized = Imager->new(
+    file     => OVERSIZED_TEST_IMG,
+    channels => 1,
+    bits     => 8,
+) or die Imager->errstr;
 eval {
     Device::PCD8544::ConvertImage::convert( $oversized );
 };
 ok( ($@ && Device::PCD8544::ImageSizeException->caught( $@ )),
     "Caught ImageSizeException" );
 
-my $test_bmp = Imager->new( file => TEST_IMG )
-    or die Imager->errstr;
+my $test_bmp = Imager->new(
+    file     => TEST_IMG,
+    channels => 1,
+    bits     => 8,
+) or die Imager->errstr;
 my $test_output = Device::PCD8544::ConvertImage::convert( $test_bmp );
 is_deeply( EXPECT_CONVERT_OUTPUT, $test_output, "Image converted" );

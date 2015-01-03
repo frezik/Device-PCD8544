@@ -45,7 +45,6 @@ sub convert
 
     my @lcd_bitmap = ();
     
-    my $total_pixels = $width * $height;
     my $word = 0x00;
     my $pixels_counted = 0;
     foreach my $x (0 .. ($width-1)) {
