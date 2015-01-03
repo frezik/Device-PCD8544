@@ -290,4 +290,154 @@ __END__
 
   Device::PCD8544 - Driver for the PCD8544 LCD controller (aka Nokia 5110)
 
+=head1 SYNOPSIS
+
+    my $rpi = Device::WebIO::RaspberryPi->new;
+    my $lcd = Device::PCD8544->new({
+        dev      => 0,
+        speed    => Device::PCD8544->SPEED_4MHZ,
+        webio    => $rpi,
+        power    => 2,
+        rst      => 24,
+        dc       => 23,
+        contrast => 0x60,
+        bias     => Device::PCD8544->BIAS_1_48,
+    });
+    
+    $lcd->init;
+    $lcd->set_image( \@PIC_OUT );
+    $lcd->update;
+
+=head1 DESCRIPTION
+
+Implements the PCD8544 LCD controller using C<Device::WebIO>. This display is 
+84x48 pixels of black-and-white.  It's similar to the one on the Nokia 5110 
+phone.
+
+=head1 METHODS
+
+=head2 new
+
+     new({
+        dev      => 0,
+        speed    => Device::PCD8544->SPEED_4MHZ,
+        webio    => $webio,
+        power    => 2,
+        rst      => 24,
+        dc       => 23,
+        contrast => 0x60,
+        bias     => Device::PCD8544->BIAS_1_48,
+    }); 
+
+Constructor.  Params:
+
+=over 4
+
+=item * dev: SPI device number against the C<webio> object
+
+=item * speed: SPI speed to run at.  Using C<SPEED_4MHZ> is good for most purposes.  If you're running at much less than 3V, you may want to reduce this to C<SPEED_2MHZ>.
+
+=item * webio: C<Device::WebIO> object that does the C<DigitalOutput> and C<SPI> roles.
+
+=item * power: GPIO pin that's powering the device.  As the display itself only draws a few milliamps, it's safe to power it from GPIO.
+
+=item * rst: GPIO pin for the reset wire.
+
+=item * dc: GPIO pin for the Data/Control wire.
+
+=item * contrast: Contrast level for the display.  This should be between 0x00 and 0x7F.  0x60 is usually a nice default.
+
+=item * bias: Set bias level of the device.  Default is BIAS_1_48.  See the device datasheet for details.
+
+=back
+
+=head2 init
+
+Sets up the pins and brings the device up.  Must be called before doing anything
+else.
+
+=head2 set_image
+
+  set_image( \@IMG );
+
+Sets an arrayref image.  Each entry is an 8-bit word, with each bit representing 
+a pixel.  See 
+
+Be sure to call C<update()> to actually send the image to the display.
+
+=head2 update
+
+Send our image buffer to the display.
+
+=head2 reset
+
+Reset the device.
+
+=head2 contrast
+
+    contrast( 0x40 )
+
+Set the contrast on the device.
+
+=head2 bias
+
+    $self->bias( $self->BIAS_1_80 )
+
+Set the bias on the device.  See the datasheet for details.  The following 
+constants are defined:
+
+    BIAS_1_100
+    BIAS_1_80
+    BIAS_1_65
+    BIAS_1_48
+    BIAS_1_40
+    BIAS_1_24
+    BIAS_1_18
+    BIAS_1_10
+
+=head2 display_blank
+
+Blank out all pixels on the display.
+
+=head2 display_normal
+
+Normal display mode of black on white background.
+
+=head2 display_all_on
+
+Turns on all pixels.
+
+=head2 display_inverse
+
+Inverse display mode of white on black background.
+
+=head1 SEE ALSO
+
+Datasheet: L<http://www.sparkfun.com/datasheets/LCD/Monochrome/Nokia5110.pdf>
+
+=head1 LICENSE
+
+Copyright (c) 2015  Timm Murray
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are 
+permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this list of 
+      conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice, this list of
+      conditions and the following disclaimer in the documentation and/or other materials 
+      provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
+COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR 
+TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 =cut
